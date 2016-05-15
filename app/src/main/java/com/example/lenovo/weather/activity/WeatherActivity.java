@@ -25,6 +25,7 @@ import java.util.BitSet;
  */
 public class WeatherActivity extends Activity implements View.OnClickListener{
     private LinearLayout weatherInfoLayout;
+    private LinearLayout liner;
     private TextView cityNameText;//城市名
     private TextView publishText;//发布时间
     private TextView weatherDespText; //天气描述
@@ -33,6 +34,8 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
     private TextView currentDateText;//日期
     private Button switchCity;
     private Button refreshWeather;
+
+    private String img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,11 +147,27 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         cityNameText.setText(prefs.getString("city_name",""));
         temp1Text.setText(prefs.getString("temp1",""));
-        temp2Text.setText(prefs.getString("temp2",""));
-        weatherDespText.setText(prefs.getString("weather_desp",""));
-        publishText.setText("今天"+prefs.getString("publish_time","")+"发布");
+        temp2Text.setText(prefs.getString("temp2", ""));
+        weatherDespText.setText(prefs.getString("weather_desp", ""));
+        img = prefs.getString("img1","");
+        Log.d("WeatherActivity", img);
+        publishText.setText("今天" + prefs.getString("publish_time", "") + "发布");
         currentDateText.setText(prefs.getString("current_date", ""));
-        Log.d("WeatherActivity", prefs.getString("current_date",""));
+        liner = (LinearLayout)findViewById(R.id.liner);
+        if ("n0.gif".equals(img)||"d0.gif".equals(img)){
+            liner.setBackgroundResource(R.drawable.bg_sunny);
+        }else if ("n1.gif".equals(img)||"d1.gif".equals(img)){
+            liner.setBackgroundResource(R.drawable.bg_cloudy);
+        }else if ("n2.gif".equals(img)||"d2.gif".equals(img)){
+            liner.setBackgroundResource(R.drawable.bg_mostly_cloudy);
+        }else if ("n6.gif".equals(img)||"d6.gif".equals(img)||"n7.gif".equals(img)||"d7.gif".equals(img)||"n8.gif".equals(img)||"d8.gif".equals(img)){
+            liner.setBackgroundResource(R.drawable.bg_rain);
+        }else if ("n13.gif".equals(img)||"d13.gif".equals(img)||"n14.gif".equals(img)||"d14.gif".equals(img)) {
+            liner.setBackgroundResource(R.drawable.bg_snow);
+        }else {
+            liner.setBackgroundResource(R.drawable.bg_windy);
+        }
+        liner.setVisibility(View.VISIBLE);
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
     }
