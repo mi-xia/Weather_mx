@@ -2,7 +2,10 @@ package com.example.lenovo.weather.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +35,8 @@ public class ChooseAreaActivity extends Activity{
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
 
+    private boolean ifFromWeatherActivity;
+
     private ProgressDialog progressDialog;
     private TextView titleText;
     private ListView listView;
@@ -51,6 +56,14 @@ public class ChooseAreaActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ifFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity",false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getBoolean("city_selected",false) && !ifFromWeatherActivity){
+            Intent intent = new Intent(this,WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         setContentView(R.layout.choose_area);
         listView = (ListView)findViewById(R.id.list_view);
         titleText = (TextView)findViewById(R.id.title_text);
@@ -66,6 +79,12 @@ public class ChooseAreaActivity extends Activity{
                 }else if (currentlevel == LEVEL_CITY){
                     selectedcity = cityList.get(position);
                     queryCounty();
+                }else if(currentlevel == LEVEL_COUNTY){
+                    String countyCode = countyList.get(position).getCountyCode();
+                    Intent intent = new Intent(ChooseAreaActivity.this,WeatherActivity.class);
+                    intent.putExtra("county_code",countyCode);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -114,7 +133,6 @@ public class ChooseAreaActivity extends Activity{
     }
 
     private void queryCounty(){
-        Log.d("ChooseAreaActivity", "23333333");
         countyList = weatherDB.loadCounty(selectedcity.getId());
         if (countyList.size() > 0){
             dataList.clear();
@@ -218,6 +236,10 @@ public class ChooseAreaActivity extends Activity{
         }else if (currentlevel == LEVEL_CITY){
             queryProvince();
         }else {
+            if (ifFromWeatherActivity){
+                Intent intent = new Intent(this,WeatherActivity.class);
+                startActivity(intent);
+            }
             finish();
         }
     }
