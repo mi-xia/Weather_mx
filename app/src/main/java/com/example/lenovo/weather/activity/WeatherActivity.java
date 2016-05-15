@@ -1,6 +1,9 @@
 package com.example.lenovo.weather.activity;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.lenovo.weather.R;
+import com.example.lenovo.weather.service.AutoUpdataService;
 import com.example.lenovo.weather.util.HttpUtil;
 import com.example.lenovo.weather.util.HtttCallbackListener;
 import com.example.lenovo.weather.util.Utility;
@@ -150,7 +154,6 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         temp2Text.setText(prefs.getString("temp2", ""));
         weatherDespText.setText(prefs.getString("weather_desp", ""));
         img = prefs.getString("img1","");
-        Log.d("WeatherActivity", img);
         publishText.setText("今天" + prefs.getString("publish_time", "") + "发布");
         currentDateText.setText(prefs.getString("current_date", ""));
         liner = (LinearLayout)findViewById(R.id.liner);
@@ -170,6 +173,8 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         liner.setVisibility(View.VISIBLE);
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this, AutoUpdataService.class);
+        startService(intent);
     }
 }
 
