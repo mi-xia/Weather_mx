@@ -42,7 +42,7 @@ public class AutoUpdataService extends Service {
                 .setTicker("今日天气")
                 .setSmallIcon(R.drawable.logo_16x)
                 .setContentTitle(prefs.getString("city_name",""))
-                .setContentText(prefs.getString("weather_desp", "")+"  "+prefs.getString("temp1","")+"~"+prefs.getString("temp2", ""))
+                .setContentText(prefs.getString("type_1", "")+"  "+prefs.getString("lowtemp_1","")+"~"+prefs.getString("hightemp_1", ""))
                 .setContentIntent(pendingIntent);
         Notification notification = mBuilder.build();
         startForeground(1,notification);
@@ -54,7 +54,7 @@ public class AutoUpdataService extends Service {
             }
         }).start();
         AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        int anHour = 5*1000;
+        int anHour =8*60*60*1000;
         long triggerAtTime = SystemClock.elapsedRealtime() + anHour;
         Intent i = new Intent(this,AutoUpdataReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this,0,i,0);
@@ -65,7 +65,7 @@ public class AutoUpdataService extends Service {
     private void updateWeather(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherCode = prefs.getString("weather_code", "");
-        String address = "http://www.weather.com.cn/data/cityinfo/"+weatherCode+".html";
+        String address = "http://www.weather.com.cn/data/list3/city"+weatherCode;
         HttpUtil.sendHttpRequest(address, new HtttCallbackListener() {
             @Override
             public void onFinish(String response) {
