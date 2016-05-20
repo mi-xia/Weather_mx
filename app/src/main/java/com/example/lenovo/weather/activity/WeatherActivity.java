@@ -54,6 +54,22 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
     private TextView high_4;
     private TextView low_4;
     private TextView date_4;
+    private TextView aqi;
+    private TextView quality;
+    private TextView pm25;
+    private TextView pm10;
+    private TextView shidu;
+    private TextView fengxiang;
+    private TextView fengli;
+    private TextView chuanyi;
+    private TextView chuanyi_detail;
+    private TextView zyx;
+    private TextView zyx_detail;
+    private TextView gm;
+    private TextView gm_detail;
+    private TextView sunrise;
+    private TextView sunset;
+
     private Button switchCity;
     private Button refreshWeather;
 
@@ -86,6 +102,21 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         low_4 = (TextView)findViewById(R.id.low_4);
         high_4 = (TextView)findViewById(R.id.high_4);
         date_4 = (TextView)findViewById(R.id.data_4);
+        aqi = (TextView)findViewById(R.id.aqi);
+        quality = (TextView)findViewById(R.id.quality);
+        pm25 = (TextView)findViewById(R.id.pm25);
+        pm10 = (TextView)findViewById(R.id.pm10);
+        shidu = (TextView)findViewById(R.id.shidu);
+        fengxiang = (TextView)findViewById(R.id.fengxiang);
+        fengli = (TextView)findViewById(R.id.fengli);
+        chuanyi = (TextView)findViewById(R.id.chuanyi);
+        chuanyi_detail = (TextView)findViewById(R.id.chuanyi_detail);
+        zyx = (TextView)findViewById(R.id.zyx);
+        zyx_detail = (TextView)findViewById(R.id.zyx_detail);
+        gm = (TextView)findViewById(R.id.gm);
+        gm_detail = (TextView)findViewById(R.id.gm_detail);
+        sunrise = (TextView)findViewById(R.id.sunrise);
+        sunset = (TextView)findViewById(R.id.sunset);
         switchCity = (Button)findViewById(R.id.switch_city);
         refreshWeather = (Button)findViewById(R.id.refresh_weather);
         String countycode = getIntent().getStringExtra("county_code");
@@ -193,11 +224,13 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
      */
 
     private void showWeather(){
+        String type;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         liner = (LinearLayout)findViewById(R.id.liner);
         cityNameText.setText(prefs.getString("city_name",""));
         temp1Text.setText(prefs.getString("lowtemp_1",""));
         temp2Text.setText(prefs.getString("hightemp_1", ""));
+        type = prefs.getString("type_1", "");
         weatherDespText.setText(prefs.getString("type_1", ""));
         publishText.setText("今天" + prefs.getString("update_time", "") + "发布");
         currentDateText.setText(prefs.getString("data_1", ""));
@@ -246,35 +279,39 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         high_4.setText(c);
         date_4.setText(prefs.getString("data_5", ""));
 
-
-
+        chuanyi.setText("穿衣指数："+prefs.getString("vlaue_3", ""));
+        chuanyi_detail.setText(prefs.getString("datail_3", ""));
+        zyx.setText("紫外线强度："+prefs.getString("vlaue_7", ""));
+        zyx_detail.setText(prefs.getString("datail_7", ""));
+        gm.setText("感冒指数："+prefs.getString("vlaue_4", ""));
+        gm_detail.setText(prefs.getString("datail_4", ""));
         BaseData baseData =new BaseData();
         environment en = new environment();
-        baseData.setCity(prefs.getString("city_name", ""));
         baseData.setTemp(prefs.getString("wendu", ""));
-        baseData.setUpDateTime(prefs.getString("update_time", ""));
-        baseData.setShidu(prefs.getString("shidu", ""));
-        baseData.setFengxiang(prefs.getString("fengxiang", ""));
-        baseData.setFengli(prefs.getString("fengli", ""));
         baseData.setSunRise(prefs.getString("sunrise", ""));
         baseData.setSunSet(prefs.getString("sunset", ""));
-        en.setAqi(prefs.getString("aqi", ""));
-        en.setPm10(prefs.getString("pm10", ""));
-        en.setPm25(prefs.getString("pm25", ""));
-        en.setQuality(prefs.getString("quality", ""));
-        /*if ("n0.gif".equals(img)||"d0.gif".equals(img)){
-            liner.setBackgroundResource(R.drawable.bg_sunny);
-        }else if ("n1.gif".equals(img)||"d1.gif".equals(img)){
-            liner.setBackgroundResource(R.drawable.bg_cloudy);
-        }else if ("n2.gif".equals(img)||"d2.gif".equals(img)){
-            liner.setBackgroundResource(R.drawable.bg_mostly_cloudy);
-        }else if ("n6.gif".equals(img)||"d6.gif".equals(img)||"n7.gif".equals(img)||"d7.gif".equals(img)||"n8.gif".equals(img)||"d8.gif".equals(img)){
+        aqi.setText("空气质量指数：" + prefs.getString("aqi", ""));
+        quality.setText("空气质量状况：" + prefs.getString("quality", ""));
+        pm25.setText("PM2.5：" + prefs.getString("pm25", ""));
+        pm10.setText("PM10：" + prefs.getString("pm10", ""));
+        shidu.setText("湿度："+prefs.getString("shidu", ""));
+        fengxiang.setText("风向：" + prefs.getString("fengxiang", ""));
+        fengli.setText("风力：" + prefs.getString("fengli", ""));
+        sunrise.setText("日出："+prefs.getString("sunrise", ""));
+        sunset.setText("日落："+prefs.getString("sunset", ""));
+
+
+        if (type.indexOf("雨")!= -1){
             liner.setBackgroundResource(R.drawable.bg_rain);
-        }else if ("n13.gif".equals(img)||"d13.gif".equals(img)||"n14.gif".equals(img)||"d14.gif".equals(img)) {
+        }else if (type.indexOf("阴")!= -1){
+            liner.setBackgroundResource(R.drawable.bg_mostly_cloudy);
+        }else if (type.indexOf("雪")!= -1){
             liner.setBackgroundResource(R.drawable.bg_snow);
-        }else {
-            liner.setBackgroundResource(R.drawable.bg_windy);
-        }*/    //设置背景
+        }else if (type.indexOf("云")!= -1){
+            liner.setBackgroundResource(R.drawable.bg_cloudy);
+        }else if (type.indexOf("晴")!= -1){
+            liner.setBackgroundResource(R.drawable.bg_sunny);
+        }
         liner.setVisibility(View.VISIBLE);
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
