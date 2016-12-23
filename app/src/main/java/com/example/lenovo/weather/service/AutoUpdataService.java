@@ -54,7 +54,7 @@ public class AutoUpdataService extends Service {
             }
         }).start();
         AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        int anHour =8*60*60*1000;
+        int anHour = 60*60*1000;
         long triggerAtTime = SystemClock.elapsedRealtime() + anHour;
         Intent i = new Intent(this,AutoUpdataReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this,0,i,0);
@@ -65,7 +65,7 @@ public class AutoUpdataService extends Service {
     private void updateWeather(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherCode = prefs.getString("weather_code", "");
-        String address = "http://www.weather.com.cn/data/list3/city"+weatherCode;
+        String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey="+weatherCode;
         HttpUtil.sendHttpRequest(address, new HtttCallbackListener() {
             @Override
             public void onFinish(String response) {

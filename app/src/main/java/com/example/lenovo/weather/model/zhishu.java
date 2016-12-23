@@ -1,9 +1,11 @@
 package com.example.lenovo.weather.model;
 
+import java.io.Serializable;
+
 /**
  * Created by lenovo on 2016/5/18.
  */
-public class zhishu {
+public class zhishu implements Serializable{
     private String name;
     private String value;
     private String detail;

@@ -1,30 +1,32 @@
 package com.example.lenovo.weather.activity;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.lenovo.weather.R;
 import com.example.lenovo.weather.model.BaseData;
 import com.example.lenovo.weather.model.environment;
+import com.example.lenovo.weather.model.zhishu;
 import com.example.lenovo.weather.service.AutoUpdataService;
 import com.example.lenovo.weather.util.HttpUtil;
 import com.example.lenovo.weather.util.HtttCallbackListener;
 import com.example.lenovo.weather.util.Utility;
 
-import java.io.BufferedReader;
-import java.util.BitSet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by lenovo on 2016/5/15.
@@ -32,6 +34,7 @@ import java.util.BitSet;
 public class WeatherActivity extends Activity implements View.OnClickListener{
     private LinearLayout weatherInfoLayout;
     private LinearLayout liner;
+    private ScrollView myScrollview;
     private TextView cityNameText;//城市名
     private TextView publishText;//发布时间
     private TextView weatherDespText; //天气描述
@@ -61,14 +64,11 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
     private TextView shidu;
     private TextView fengxiang;
     private TextView fengli;
-    private TextView chuanyi;
-    private TextView chuanyi_detail;
-    private TextView zyx;
-    private TextView zyx_detail;
-    private TextView gm;
-    private TextView gm_detail;
+    private TextView temp_tView;
     private TextView sunrise;
     private TextView sunset;
+    private  zhishu zhishus;
+    private List<zhishu> zhishuList  =  new ArrayList<zhishu>();
 
     private Button switchCity;
     private Button refreshWeather;
@@ -79,6 +79,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
+
         weatherInfoLayout = (LinearLayout)findViewById(R.id.weather_info_layout);
         cityNameText = (TextView)findViewById(R.id.city_name);
         publishText = (TextView)findViewById(R.id.publish_text);
@@ -109,28 +110,45 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         shidu = (TextView)findViewById(R.id.shidu);
         fengxiang = (TextView)findViewById(R.id.fengxiang);
         fengli = (TextView)findViewById(R.id.fengli);
-        chuanyi = (TextView)findViewById(R.id.chuanyi);
-        chuanyi_detail = (TextView)findViewById(R.id.chuanyi_detail);
-        zyx = (TextView)findViewById(R.id.zyx);
-        zyx_detail = (TextView)findViewById(R.id.zyx_detail);
-        gm = (TextView)findViewById(R.id.gm);
-        gm_detail = (TextView)findViewById(R.id.gm_detail);
+        temp_tView = (TextView)findViewById(R.id.temp_tview);
+
         sunrise = (TextView)findViewById(R.id.sunrise);
         sunset = (TextView)findViewById(R.id.sunset);
         switchCity = (Button)findViewById(R.id.switch_city);
         refreshWeather = (Button)findViewById(R.id.refresh_weather);
+
+        Zhishu_Adapter  zhishu_adapter = new Zhishu_Adapter(WeatherActivity.this,R.layout.list_zhishu,zhishuList);
+        ListView zs_ListView = (ListView)findViewById(R.id.list_zhishu);
+        zs_ListView.setAdapter(zhishu_adapter);
+        zhishu_adapter.notifyDataSetChanged();
+
+        LayoutAnimationController lac = new LayoutAnimationController(AnimationUtils.loadAnimation(this, R.anim.zoom_in));
+        lac.setOrder(LayoutAnimationController.ORDER_NORMAL);
+        zs_ListView.setLayoutAnimation(lac);
+        zs_ListView.startLayoutAnimation();
+
         String countycode = getIntent().getStringExtra("county_code");
         if (!TextUtils.isEmpty(countycode)){
             publishText.setText("同步中...");
             weatherInfoLayout.setVisibility(View.INVISIBLE);
             cityNameText.setVisibility(View.INVISIBLE);
             queryWeatherCode(countycode);
+            zhishu_adapter.notifyDataSetChanged();
         }else {
             showWeather();
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+               //startSerview(zhishu_adapter);
+            }
+        }).start();
+
         switchCity.setOnClickListener(this);
         refreshWeather.setOnClickListener(this);
     }
+
 
     @Override
     public void onClick(View v) {
@@ -224,6 +242,8 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
      */
 
     private void showWeather(){
+        myScrollview = (ScrollView)findViewById(R.id.scrollView);
+        myScrollview.smoothScrollTo(0,20);
         String type;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         liner = (LinearLayout)findViewById(R.id.liner);
@@ -234,6 +254,8 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         weatherDespText.setText(prefs.getString("type_1", ""));
         publishText.setText("今天" + prefs.getString("update_time", "") + "发布");
         currentDateText.setText(prefs.getString("data_1", ""));
+
+        temp_tView.setText(prefs.getString("wendu","")+"℃");
 
         type_1.setText(prefs.getString("type_2", ""));
         String a = prefs.getString("lowtemp_2", "");
@@ -279,12 +301,6 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         high_4.setText(c);
         date_4.setText(prefs.getString("data_5", ""));
 
-        chuanyi.setText("穿衣指数："+prefs.getString("vlaue_3", ""));
-        chuanyi_detail.setText(prefs.getString("datail_3", ""));
-        zyx.setText("紫外线强度："+prefs.getString("vlaue_7", ""));
-        zyx_detail.setText(prefs.getString("datail_7", ""));
-        gm.setText("感冒指数："+prefs.getString("vlaue_4", ""));
-        gm_detail.setText(prefs.getString("datail_4", ""));
         BaseData baseData =new BaseData();
         environment en = new environment();
         baseData.setTemp(prefs.getString("wendu", ""));
@@ -300,6 +316,20 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
         sunrise.setText("日出："+prefs.getString("sunrise", ""));
         sunset.setText("日落："+prefs.getString("sunset", ""));
 
+
+        for (int i = 1; i<=11;i++){
+            zhishus = new zhishu();
+            zhishus.setName(prefs.getString("name_"+i, ""));
+            zhishus.setValue(prefs.getString("vlaue_" + i, ""));
+            zhishus.setDetail(prefs.getString("datail_" + i, ""));
+            zhishuList.add(zhishus);
+
+        }
+
+        Zhishu_Adapter  zhishu_adapter = new Zhishu_Adapter(WeatherActivity.this,R.layout.list_zhishu,zhishuList);
+        ListView zs_ListView = (ListView)findViewById(R.id.list_zhishu);
+        zs_ListView.setAdapter(zhishu_adapter);
+        zhishu_adapter.notifyDataSetChanged();
 
         if (type.indexOf("雨")!= -1){
             liner.setBackgroundResource(R.drawable.bg_rain);

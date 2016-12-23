@@ -111,7 +111,6 @@ public class Utility {
 
         int count = 1;
         int count2 = 1;
-        Log.d("Untility handle", response);
         try{
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser xmlPullParser = factory.newPullParser();
@@ -191,20 +190,8 @@ public class Utility {
                     case XmlPullParser.END_TAG: {
                         if ("sunrise_2".equals(nodeName)) {
                             saveWeatherInfoBaseData(context,baseData);
-                            Log.d("mainactivity", baseData.getCity());
-                            Log.d("mainactivity", baseData.getUpDateTime());
-                            Log.d("mainactivity", baseData.getTemp());
-                            Log.d("mainactivity", baseData.getFengli());
-                            Log.d("mainactivity", baseData.getShidu());
-                            Log.d("mainactivity", baseData.getFengxiang());
-                            Log.d("mainactivity", baseData.getSunRise());
-                            Log.d("mainactivity", baseData.getSunSet());
                         }else if("environment".equals(nodeName)){
                             saveWeatherInfoEn(context,en);
-                            Log.d("mainactivity",en.getAqi());
-                            Log.d("mainactivity",en.getPm25());
-                            Log.d("mainactivity",en.getQuality());
-                            Log.d("mainactivity",en.getPm10());
                         }else if("weather".equals(nodeName)){
                             if ("暂无".equals(en.getAqi())){
                                 saveWeatherInfoEn(context,en);
@@ -212,19 +199,10 @@ public class Utility {
                             saveWeatherInfo(context,foreCast,count);
                             count++;
                             if (count>11){count = 1;}
-                            Log.d("mainactivity", foreCast.getData());
-                            Log.d("mainactivity", foreCast.getFengxiang());
-                            Log.d("mainactivity", foreCast.getFengli());
-                            Log.d("mainactivity", foreCast.getType());
-                            Log.d("mainactivity", foreCast.getHighTemp());
-                            Log.d("mainactivity", foreCast.getLowTemp());
                         }else if("zhishu".equals(nodeName)) {
                             saveWeatherInfoZs(context,zs,count2);
                             count2++;
                             if (count2>11){count2 = 1;}
-                            Log.d("mainactivity", zs.getName());
-                            Log.d("mainactivity", zs.getValue());
-                            Log.d("mainactivity", zs.getDetail());
 
                         }
                         break;
