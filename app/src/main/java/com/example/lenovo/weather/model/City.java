@@ -6,6 +6,7 @@ package com.example.lenovo.weather.model;
 public class City {
 
     private int id;
+    private double dou;
     private String cityName;
     private String cityCode;
     private int provinceId;
